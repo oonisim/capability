@@ -60,6 +60,49 @@ across scripts.
 
 ---
 
+# Naming Conventions
+
+## Sourced Files (prefixed with `_`)
+
+Files that are sourced (not executed directly) **must** be prefixed with
+`_<service>_` or `_<abbreviation>_` for namespace safety. This prevents
+function name collisions when multiple libraries are sourced into the
+same shell session.
+
+| Service          | Prefix           | File example               | Function example                      |
+|------------------|------------------|----------------------------|---------------------------------------|
+| EC2              | `_aws_ec2_`      | `_aws_ec2.sh`              | `_aws_ec2_get_lifecycle_state`        |
+| SSM              | `_aws_ssm_`      | `_aws_ssm.sh`              | `_aws_ssm_command_run`                |
+| Secrets Manager  | `_aws_sm_`       | `_aws_sm_rotate_secret.sh` | `_aws_sm_read_secret`, `_sm_rotate`   |
+| S3               | `_aws_s3_`       | `_aws_s3_common.sh`        | `_aws_s3_bucket_exists`               |
+| Bedrock          | `_aws_bedrock_`  | `_aws_bedrock_api.sh`      | `_aws_bedrock_get_apikey`             |
+| Session mgmt     | `_aws_session_`  | `_aws_session_utility.sh`  | `_aws_session_is_role_matched`        |
+| Profile mgmt     | `_aws_profile_`  | (same file)                | `_aws_profile_is_token_valid`         |
+
+Rules:
+
+1. **Filename**: `_<vedor/product>_<service>_<purpose>.sh` — the service prefix makes the
+   file's domain immediately obvious in `source` statements.
+2. **Functions**: All functions in the file must share the same
+   `_<service>_` prefix (or `_aws_<service>_` for AWS-specific utilities).
+   This prevents collisions when sourced alongside other libraries.
+3. **Internal helpers**: Nested or file-private functions should also use
+   the service prefix: `_bedrock_load_key_file`, not `_load_key_file`.
+4. **No bare names**: Never define a sourced function without a namespace
+   prefix (e.g. `check_bucket_exists` is wrong; `_s3_bucket_exists` is
+   correct).
+
+## Executed Scripts (no `_` prefix)
+
+Scripts that are executed directly (not sourced) use descriptive names
+without the `_` prefix: `aws_login_monash.sh`, `empty_bucket.sh`,
+`bedrock_monitor_models.sh`.
+
+Functions inside executed scripts may use any naming scheme since they
+are not exposed to other scripts' namespaces.
+
+---
+
 # Required Function Documentation Format
 
 Every function **must include a documentation header** immediately before the
@@ -159,8 +202,50 @@ readonly cache_file
 #   $2  safety_margin_sec — seconds before expiration to treat token
 #                          as expired
 #----------------------------------------------------------------------
-aws_is_cli_cached_token_valid() {
+_aws_session_is_cli_cache_valid() {
     local cache_dir="${1:-$HOME/.aws/cli/cache}"
     local margin_sec="${2:-0}"
 }
 ```
+
+---
+
+# When to Create a Utility Function
+
+Create a reusable function when:
+
+- Logic appears in **2+ scripts**
+- Logic interacts with **external systems** (AWS, Azure, Git, etc.)
+- Logic requires **structured error handling**
+- Logic is **non‑trivial** (>10 lines)
+
+---
+
+# Repository Usage Pattern
+
+Shared utilities should live in:
+
+```
+aws/authentication/_aws_session_utility.sh
+```
+
+Scripts should load utilities using:
+
+```
+source "$(dirname "$0")/_aws_session_utility.sh"
+```
+
+---
+
+# Summary
+
+All Bash utilities must:
+
+- include standardized documentation
+- behave like pure functions
+- accept configuration via arguments
+- avoid global side effects
+- use clear exit codes
+
+Following these rules keeps the SMST tooling predictable, maintainable,
+and safe to reuse across projects.

@@ -155,7 +155,7 @@ reranked = [
 ]
 ```
 ---
-# Structure
+# Structure 
 
 Code is organised into modules that are decoupled, single-responsibility, and
 independent of external dependencies. The foundation of this structure is the
