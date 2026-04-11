@@ -1,9 +1,8 @@
 # Bash Function Implementation Knowledge
 
 This document defines the **standard rules for implementing reusable Bash
-functions** in the SMST tooling repositories. The goal is to ensure that all
-utility functions are predictable, composable, testable, and safe to reuse
-across scripts.
+functions**. The goal is to ensure that all utility functions are predictable, 
+composable, testable, and safe to reuse across scripts.
 
 ## Core Principles
 
@@ -247,5 +246,3 @@ All Bash utilities must:
 - avoid global side effects
 - use clear exit codes
 
-Following these rules keeps the SMST tooling predictable, maintainable,
-and safe to reuse across projects.
