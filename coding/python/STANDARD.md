@@ -252,6 +252,120 @@ of the program's logic and structure. A reader should understand what is
 happening from a single glance — not from a comment.
 
 ---
+# Error Handling
+
+Repeated `try/except` blocks that perform the same translation — catch library
+exception, log, re-raise as domain exception — violate DRY and scatter the
+error boundary across the codebase. Pack the common handling into a
+**decorator**: the error contract is stated once, each function body stays clean.
+
+## 11. Error-Handling Decorator
+
+### Problem — repeated try/except
+
+```python
+# Bad — same error translation duplicated in every AWS function
+def fetch_secret(name: str, client: SecretsManagerClient) -> dict:
+    try:
+        return client.get_secret_value(SecretId=name)
+    except ClientError as exc:
+        code = exc.response["Error"]["Code"]
+        logger.error("AWS error fetching '%s': %s", name, code)
+        raise RuntimeError(f"AWS error {code}") from exc
+
+def delete_secret(name: str, client: SecretsManagerClient) -> None:
+    try:
+        client.delete_secret(SecretId=name, ForceDeleteWithoutRecovery=True)
+    except ClientError as exc:
+        code = exc.response["Error"]["Code"]
+        logger.error("AWS error deleting '%s': %s", name, code)
+        raise RuntimeError(f"AWS error {code}") from exc
+```
+
+### Solution — decorator
+
+```python
+import functools
+import logging
+from collections.abc import Callable
+from typing import TypeVar
+
+from botocore.exceptions import ClientError
+
+_F = TypeVar("_F", bound=Callable)  # pylint: disable=invalid-name  # short generic
+
+logger = logging.getLogger(__name__)
+
+
+def handle_aws_errors(func: _F) -> _F:
+    """Translate botocore ClientError to RuntimeError, with one log entry.
+
+    Apply to any function that makes AWS API calls. Catches ClientError, logs
+    the function name, AWS error code and message (never secret values), then
+    re-raises as RuntimeError so callers work against a stable exception type.
+
+    Args:
+        func: The decorated function. Must be a plain function or method —
+              not a coroutine (async functions need an async wrapper).
+
+    Returns:
+        Wrapped function with identical signature.
+
+    Raises:
+        RuntimeError: When the underlying AWS call raises ClientError.
+
+    Usage::
+
+        @handle_aws_errors
+        def fetch_secret(name: str, client: SecretsManagerClient) -> dict:
+            return client.get_secret_value(SecretId=name)
+    """
+    @functools.wraps(func)
+    def _wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ClientError as exc:
+            code = exc.response["Error"]["Code"]
+            msg = exc.response["Error"]["Message"]
+            logger.error("%s failed — AWS %s: %s", func.__qualname__, code, msg)
+            raise RuntimeError(
+                f"{func.__qualname__} failed — AWS {code}: {msg}"
+            ) from exc
+
+    return _wrapper  # type: ignore[return-value]
+
+
+# Clean — each function body has zero error-handling boilerplate
+@handle_aws_errors
+def fetch_secret(name: str, client: SecretsManagerClient) -> dict:
+    return client.get_secret_value(SecretId=name)
+
+@handle_aws_errors
+def delete_secret(name: str, client: SecretsManagerClient) -> None:
+    client.delete_secret(SecretId=name, ForceDeleteWithoutRecovery=True)
+```
+
+### Rules
+
+| Rule | Rationale |
+|------|-----------|
+| Always use `functools.wraps` | Preserves `__name__`, `__doc__`, `__qualname__` for introspection |
+| Log inside the decorator, not the function | One log site; consistent format across all decorated functions |
+| Never log argument values that may be secrets | Log only `func.__qualname__`, error code, and provider message |
+| Re-raise as a domain exception | Callers depend on a stable type, not a library-internal type |
+| One decorator per error domain | `handle_aws_errors`, `handle_db_errors` — never mix exception types |
+| Narrowest possible `except` clause | Catch only what the decorated function can actually raise |
+
+### When NOT to use a decorator
+
+Use an inline `try/except` instead when:
+
+- The handling is unique to that function (no pattern to reuse).
+- The `except` clause must inspect the function's arguments to vary behaviour —
+  that is a sign the abstraction is wrong.
+- The function is a coroutine (`async def`) — use an `async`-aware wrapper.
+
+---
 # Verification
 
 Validity of the code requires three dimensions:
@@ -262,7 +376,7 @@ Validity of the code requires three dimensions:
 | **Correctness**  | Does the code express the intended semantics?        | Type system (static), tests (behavioural) |
 | **Completeness** | Does the code handle all required cases?             | Tests, exhaustiveness checking          |
 
-## 11. Linting
+## 12. Linting
 
 All code must pass `ruff check` and `pylint` with a score of 10/10.
 Configure both tools in `pyproject.toml`. Suppress only genuine false-positives
@@ -274,7 +388,7 @@ class RankingMetrics(BaseModel):
     ...
 ```
 
-## 12. Tests
+## 13. Tests
 
 Every function must have a corresponding test module. Every path through the
 function — including all branches, error paths, and strategy options — must be
@@ -321,7 +435,7 @@ Test cases that probe behaviour at or beyond boundary conditions:
 
 `test_<function_name>__<scenario>` — double underscore separates function from scenario.
 
-## 13. Coverage
+## 14. Coverage
 
 Aim for 100% line and branch coverage on all functions. Use `pytest-cov` to
 measure and report. Every line of code, every branch, and every error path must
