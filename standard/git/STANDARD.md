@@ -9,14 +9,14 @@ All Bash scripts and BATS tests must pass spell‑check.
 Scope:
 
 ```
-smst-tool/**/*.sh
-smst-tool/tests/**/*.bats
+shared-tool/**/*.sh
+shared-tool/tests/**/*.bats
 ```
 
 Recommended tool:
 
 ```
-codespell smst-tool
+codespell shared-tool
 ```
 
 ## Formatting

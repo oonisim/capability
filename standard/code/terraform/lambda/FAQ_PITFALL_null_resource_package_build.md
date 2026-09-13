@@ -1,5 +1,7 @@
 # Pitfall: Lambda Package Build with `null_resource` + `archive_file` Fails in CI
 
+Project names, paths, and identifiers in the examples are anonymised.
+
 ## Problem Statement
 
 A Terraform configuration that builds a Lambda deployment package locally
@@ -10,11 +12,11 @@ fails every time it runs in CI (e.g., Bitbucket Pipelines, GitHub Actions):
 ```
 Error: Archive creation error
 
-  with module.lambda.archive_file.lambda_scribe_endpoint,
-  on modules/lambda/build_lambda_scribe_endpoint.tf line 121
+  with module.lambda.archive_file.lambda_rules_endpoint,
+  on modules/lambda/build_lambda_rules_endpoint.tf line 121
 
 error creating archive: error archiving directory: could not archive
-missing directory: /opt/atlassian/pipelines/agent/build/.../modules/lambda/_build/lambda-scribe-endpoint
+missing directory: /opt/atlassian/pipelines/agent/build/.../modules/lambda/_build/lambda-rules-endpoint
 ```
 
 The `_build/` directory does not exist at the time Terraform tries to create
@@ -157,28 +159,28 @@ pipelines:
     - step:
         name: Build Lambda package
         script:
-          - cd src/app/scribe/endpoint
+          - cd src/app/rules/endpoint
           - pip3 install -r requirements.txt --target ./package --no-compile
           - cp *.py ./package/
           - cd package && zip -r ../lambda_function.zip . && cd ..
         artifacts:
-          - src/app/scribe/endpoint/lambda_function.zip
+          - src/app/rules/endpoint/lambda_function.zip
 
     - step:
         name: Terraform apply
         script:
-          - terraform -chdir=platform/iac/terraform/deployment/degreeworks-scribe apply
+          - terraform -chdir=platform/iac/terraform/deployment/rules-service apply
 ```
 
 ### Terraform references the pre-built zip
 
 ```hcl
-module "scribe_endpoint" {
+module "rules_endpoint" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "~> 7.0"
 
   create_package         = false
-  local_existing_package = "${path.root}/../../../src/app/scribe/endpoint/lambda_function.zip"
+  local_existing_package = "${path.root}/../../../src/app/rules/endpoint/lambda_function.zip"
 
   handler = "lambda_handler.dispatch"
   runtime = "python3.11"
@@ -208,7 +210,7 @@ module "boto3_layer" {
   compatible_runtimes = ["python3.11"]
 
   create_package         = false
-  local_existing_package = "${path.root}/../../../src/app/scribe/endpoint/boto3_layer.zip"
+  local_existing_package = "${path.root}/../../../src/app/rules/endpoint/boto3_layer.zip"
 }
 ```
 
@@ -251,11 +253,11 @@ When `source_path` points to the source directory, all files land at the
 **zip root**. Update imports in `lambda_handler.py` accordingly:
 
 ```python
-# Before (files nested inside app/scribe/endpoint/ in zip):
-from app.scribe.endpoint.api import ScribeClient
+# Before (files nested inside app/rules/endpoint/ in zip):
+from app.rules.endpoint.api import RuleClient
 
 # After (files at zip root):
-from api import ScribeClient
+from api import RuleClient
 ```
 
 ---
@@ -277,7 +279,7 @@ removed {
 }
 
 removed {
-  from = archive_file.lambda_scribe_endpoint
+  from = archive_file.lambda_rules_endpoint
   lifecycle {
     destroy = false
   }

@@ -242,7 +242,7 @@ only the smallest remaining uncertainty.
 ## Existing Experiment Examples
 
 For a compact source-grounded synthetic experiment, see
-`doc/application/scribe/agent/compiler/SYNTETIC_EXPERIMENT_EXAMPLE.md`.
+`doc/application/rules/agent/compiler/SYNTETIC_EXPERIMENT_EXAMPLE.md`.
 
 For established control/treatment plans, execution records, and result reports,
-see `doc/application/scribe/agent/compiler/experiment/`.
+see `doc/application/rules/agent/compiler/experiment/`.

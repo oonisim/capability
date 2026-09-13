@@ -65,7 +65,7 @@ Shell Scripting
 Namespace
 
 Objective
-Avoid function name conflicts when smst-tool is sourced into other repositories.
+Avoid function name conflicts when shared-tool is sourced into other repositories.
 
 Policy
 Sourceable shell modules must use the namespace
@@ -80,10 +80,10 @@ Shell functions share a single global namespace when scripts are sourced.
 Failure Mode
 Without deterministic naming, functions from different modules can override each other when multiple files are sourced in the same shell process.
 
-This commonly occurs because smst-tool is reused across repositories, often as a git submodule.
+This commonly occurs because shared-tool is reused across repositories, often as a git submodule.
 
 Scope
-smst-tool contains two types of shell scripts:
+shared-tool contains two types of shell scripts:
 
 scripts executed directly
 scripts sourced as reusable modules
@@ -107,7 +107,7 @@ _aws_s3_download
 _aws_s3_sync_bucket
 
 Result
-smst-tool can be safely sourced by any repository without introducing function name conflicts.
+shared-tool can be safely sourced by any repository without introducing function name conflicts.
 ```
 
 Structure Explanation

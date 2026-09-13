@@ -1,9 +1,11 @@
 # Plan: Chaos Monkey Simulation
 
+Project names, paths, and identifiers in the examples are anonymised.
+
 ## Purpose
 
 Document what happens when each external dependency is unavailable or
-misbehaving during a Scribe job. For each scenario: the exception raised, the
+misbehaving during a Rules job. For each scenario: the exception raised, the
 log messages emitted, the audit events written, and the user-facing outcome.
 
 Use this as a testing checklist and a debugging reference when diagnosing
@@ -16,42 +18,42 @@ Client HTTP
     |
     v
 Frontend (application.py / Application)
-    |-- DynamoDB: scribe_job, scribe_job_log
+    |-- DynamoDB: rules_job, rules_job_log
     |-- SQS job-in: submits job payload to Y
     |-- SQS job-out: receives events from Y
     |
     v
 Worker (job.py / Runner)
-    |-- DynamoDB: scribe_job, scribe_job_log
+    |-- DynamoDB: rules_job, rules_job_log
     |-- SQS job-out: sends JOB_ACCEPTED / JOB_WAITING / JOB_PROGRESS / JOB_COMPLETED
     |
     v
 Workflow (nodes.py)
     |-- LLM provider
     |-- Knowledge service
-    |-- Scribe parse endpoint
-    |-- CourseLoop service
+    |-- Rules parse endpoint
+    |-- Requirements service
 ```
 
 ## Dependency Scenarios
 
 ---
 
-### 1. Scribe Parse Endpoint Down
+### 1. Rules Parse Endpoint Down
 
-**What is it:** The HTTP endpoint that validates Scribe DSL syntax.
-Called from `parse_scribe_block` node via `execute_scribe_parse(...)`.
+**What is it:** The HTTP endpoint that validates Rules DSL syntax.
+Called from `parse_rules_block` node via `execute_rules_parse(...)`.
 
 **What happens:**
 
 `_await_with_liveness(...)` wraps the call. If the endpoint is down, the HTTP
-client raises a connection or timeout exception. Because `parse_scribe_block`
+client raises a connection or timeout exception. Because `parse_rules_block`
 does not catch exceptions from the parse call itself, the exception propagates
 to the workflow executor.
 
 **Exception raised:**
 
-Connection refused, timeout, or HTTP error from the Scribe client. The exact
+Connection refused, timeout, or HTTP error from the Rules client. The exact
 type depends on the HTTP client implementation (typically `aiohttp.ClientError`
 or a wrapped provider exception).
 
@@ -61,7 +63,7 @@ or a wrapped provider exception).
 endpoint is unreachable before a response is returned, no `PARSE_CALL` audit
 row is written for that attempt.
 
-If the error escapes `parse_scribe_block`, the workflow aborts. `Runner._execute`
+If the error escapes `parse_rules_block`, the workflow aborts. `Runner._execute`
 catches the exception:
 
 ```
@@ -89,14 +91,14 @@ record status from DDB and any log events fetched by `_abort_payload(...)`.
 **Normal parse failure (endpoint returns ok=False) is different:**
 
 If the parse endpoint responds with `ok: false`, that is not a crash. The
-workflow routes to `repair_scribe_block`. After `_MAX_REPAIR_ATTEMPTS` (3)
+workflow routes to `repair_rules_block`. After `_MAX_REPAIR_ATTEMPTS` (3)
 failed repairs, `semantic_review` sets `requires_human_review: true`. The job
 completes with `JOB_COMPLETED` but the result is flagged for human review.
 
 Audit events written on each attempt:
 
 ```
-PARSE_CALL: ok, status_code, message, raw_response, scribe_text, parser_scribe_text, labeltag_rewrite
+PARSE_CALL: ok, status_code, message, raw_response, rules_text, parser_rules_text, labeltag_rewrite
 ```
 
 ---
@@ -105,8 +107,8 @@ PARSE_CALL: ok, status_code, message, raw_response, scribe_text, parser_scribe_t
 
 **What is it:** The external LLM API (e.g., Anthropic/Bedrock).
 Called from `_call_llm_tool_loop(...)` via `llm.complete(...)` in all
-generation phases: `extract_scribe_ast`, `plan_scribe_block`, `draft_scribe_block`,
-`repair_scribe_block`, `semantic_review`.
+generation phases: `extract_rules_ast`, `plan_rules_block`, `draft_rules_block`,
+`repair_rules_block`, `semantic_review`.
 
 **What happens:**
 
@@ -206,7 +208,7 @@ error is treated as a normal knowledge failure (degraded mode).
 
 | Source | Level | Message / action key |
 |---|---|---|
-| `nodes.py` | WARNING | `scribe block example retrieval failed; continuing` (for indexed example failures) |
+| `nodes.py` | WARNING | `rules block example retrieval failed; continuing` (for indexed example failures) |
 | `nodes.py` | WARNING | `indexed_example_retrieval_degraded` / `indexed_example_retrieval_degraded` |
 | `nodes.py` | WARNING | `knowledge_search_skipped_empty_query` / `knowledge_search_skipped_empty_query` (if query is blank) |
 
@@ -222,39 +224,39 @@ fails), the workflow aborts and sends `JOB_ABORTED`.
 
 ---
 
-### 4. CourseLoop Service Down
+### 4. Requirements Service Down
 
 **What is it:** The service that resolves course requirements by `course_sys_id`.
-Called from `collect_input` node via `_fetch_courseloop(...)`.
+Called from `collect_input` node via `_fetch_requirements_service(...)`.
 
 **What happens:**
 
-`_fetch_courseloop(...)` does not catch exceptions. If the CourseLoop client
+`_fetch_requirements_service(...)` does not catch exceptions. If the RequirementsService client
 raises, the exception propagates out of `collect_input`. The workflow aborts at
 the first node.
 
 **Partial failure (service responds with error field):**
 
-If CourseLoop returns a response with `raw_course["error"]` set, the call
+If RequirementsService returns a response with `raw_course["error"]` set, the call
 succeeds at the HTTP level. The audit event records `degraded: true` and the
-`error` string. The workflow continues with whatever requirements CourseLoop
+`error` string. The workflow continues with whatever requirements RequirementsService
 returned.
 
 **Audit events written:**
 
-`COURSELOOP_CALL` with `degraded: true` and `error: str(...)` for partial
+`REQUIREMENTS_SERVICE_CALL` with `degraded: true` and `error: str(...)` for partial
 failures. Nothing written if the exception is raised before the call returns.
 
 **Log messages:**
 
 | Source | Level | Message / action key |
 |---|---|---|
-| `job.py` | ERROR | `job setup or pipeline raised unhandled exception` / `pipeline_error` (if CourseLoop raises) |
+| `job.py` | ERROR | `job setup or pipeline raised unhandled exception` / `pipeline_error` (if RequirementsService raises) |
 
 **User-facing SSE event:**
 
-- If CourseLoop raises: `JOB_ABORTED` with `status: "ABORTED"`.
-- If CourseLoop returns partial data: job continues normally; `JOB_COMPLETED`
+- If RequirementsService raises: `JOB_ABORTED` with `status: "ABORTED"`.
+- If RequirementsService returns partial data: job continues normally; `JOB_COMPLETED`
   is the likely outcome unless downstream failures occur.
 
 **Job final state in DDB:** `ABORTED` (unavailable) or `PROCESSED` (partial data)
@@ -437,7 +439,7 @@ log.warning("send_waiting failed; continuing workflow phase", ...)
 extra: {"action": "send_waiting_failed", "state": ...}
 ```
 
-Audit event `WAITING_SEND_FAILED` is also written to `scribe_job_log`.
+Audit event `WAITING_SEND_FAILED` is also written to `rules_job_log`.
 
 Frontend `abort_at` deadline is not extended. If the LLM or parse call takes
 longer than the existing `abort_at`, the frontend may time out and abort the
@@ -467,7 +469,7 @@ log.warning("trace progress send failed; dropping", ...)
 extra: {"action": "trace_progress_failed", "job_id": ...}
 ```
 
-The trace notification is dropped. The durable audit row in `scribe_job_log`
+The trace notification is dropped. The durable audit row in `rules_job_log`
 is unaffected. The frontend will not see this trace event in SSE.
 
 #### 7e. JOB_COMPLETED Send Fails
@@ -542,7 +544,7 @@ extra: {"action": "frontend_dead", "job_id": ...}
 `_handle_frontend_dead()` is called:
 
 - Best-effort `ABORTED` write to DDB.
-- Best-effort `FRONTEND_DEAD` audit row to `scribe_job_log`.
+- Best-effort `FRONTEND_DEAD` audit row to `rules_job_log`.
 - If `ABORTED` write is rejected (frontend already wrote ABORTED):
   ```
   log.info("ABORTED write rejected; frontend already aborted", ...)
@@ -591,7 +593,7 @@ except Exception:
 **Audit events written:**
 
 No specific audit event is written by this path. Whatever the failing node
-wrote before the exception is in `scribe_job_log`.
+wrote before the exception is in `rules_job_log`.
 
 **User-facing SSE event:**
 
@@ -639,7 +641,7 @@ The second worker deletes the message and moves on. No duplicate execution.
 | Parse returns ok=false, repairs exhausted | PROCESSED | JOB_COMPLETED (human review) | `PARSE_CALL` + `requires_human_review` |
 | LLM provider unreachable | ABORTED | JOB_ABORTED | `pipeline_error` |
 | Knowledge service down | PROCESSED (degraded) | JOB_COMPLETED (human review) or JOB_ABORTED | `knowledge_search_failed` + `KNOWLEDGE_DEGRADED` |
-| CourseLoop unreachable | ABORTED | JOB_ABORTED | `pipeline_error` |
+| RequirementsService unreachable | ABORTED | JOB_ABORTED | `pipeline_error` |
 | DDB down at submission | Not created | HTTP 503 | none (propagated) |
 | DDB down mid-execution (audit writes) | PROCESSING (incomplete audit) | none immediately | `log_step_failed` |
 | DDB down mid-execution (liveness) | ABORTED (eventual) | JOB_ABORTED (synthesized) | `liveness_poll_failed` then `frontend_dead` |
@@ -655,11 +657,11 @@ The second worker deletes the message and moves on. No duplicate execution.
 
 To exercise each scenario manually in a local canary run:
 
-- **Parse endpoint down:** Set `SCRIBE_PARSE_ENDPOINT` to an unreachable URL.
+- **Parse endpoint down:** Set `RULES_PARSE_ENDPOINT` to an unreachable URL.
   Expect `JOB_ABORTED` and `pipeline_error` in logs.
 
 - **LLM provider down:** Block outbound traffic to the LLM host or set an
-  invalid `SCRIBE_LLM_MODEL`. Expect `pipeline_error` after retries are
+  invalid `RULES_LLM_MODEL`. Expect `pipeline_error` after retries are
   exhausted.
 
 - **Knowledge service down:** Set knowledge service endpoint to an unreachable

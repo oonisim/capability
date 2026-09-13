@@ -109,7 +109,7 @@ Programs did not need a different interface for every type of resource. They cou
 
 > Do not add exceptions. Find the smallest general mechanism that makes the exceptions disappear.
 
-For the Scribe compiler, that means avoiding case-specific repair rules such as:
+For the Rules compiler, that means avoiding case-specific repair rules such as:
 
 ```text
 if substitution:

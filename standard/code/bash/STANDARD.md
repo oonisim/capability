@@ -94,7 +94,7 @@ Rules:
 ## Executed Scripts (no `_` prefix)
 
 Scripts that are executed directly (not sourced) use descriptive names
-without the `_` prefix: `aws_login_monash.sh`, `empty_bucket.sh`,
+without the `_` prefix: `aws_login_example.sh`, `empty_bucket.sh`,
 `bedrock_monitor_models.sh`.
 
 Functions inside executed scripts may use any naming scheme since they

@@ -317,7 +317,7 @@ Boundary-leak check:
 - Aligns with doc/standards/system/DESIGN.md:39.
 - The new module owns one concern: schema-valid-but-not-renderable coverage.
 - It imports schema models, but schema modules do not import it.
-- It does not render Scribe, mutate AST, call parser, or own schema validity.
+- It does not render Rules, mutate AST, call parser, or own schema validity.
 - No new boundary leak introduced.
 ```
 

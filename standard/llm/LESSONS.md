@@ -1,5 +1,7 @@
 # LLM Lessons
 
+Project names, paths, and identifiers in the examples are anonymised.
+
 ## Diagnostics Must Record Rejected Choices
 
 When an experiment depends on understanding LLM behaviour, do not ask only for
@@ -15,7 +17,7 @@ Decision traces must capture:
 - unsupported handoffs and reasons.
 
 This matters because failures often happen before the visible action. In the
-A6004 AST experiment, the model considered `GroupRule` but rejected it before
+CASE-A AST experiment, the model considered `GroupRule` but rejected it before
 symbol lookup because it had split the mutual-exclusion note away from the
 counted population. A trace of only executed searches would hide the real
 failure.
@@ -29,10 +31,10 @@ For diagnostic prompts, require concise checkable records such as:
 Do not request private chain-of-thought. Ask for observable decisions, evidence,
 candidate names, lookup status, and short reasons.
 
-## B6039: Treat LLM Input Shape as Behaviour
+## CASE-B: Treat LLM Input Shape as Behaviour
 
 An LLM request schema is part of runtime behaviour, even when a changed field
-adds no academic meaning. B6039 exposed this boundary: adding `pool_id` to pool
+adds no academic meaning. CASE-B exposed this boundary: adding `pool_id` to pool
 objects repeated identity already carried elsewhere and changed the request
 shape. In a bounded rebuilt sample, the field-absent shape produced valid
 initial AST JSON in three runs; the field-present shape produced malformed JSON
@@ -56,32 +58,32 @@ When inspecting a request, parse its real payload boundary. Prompt examples can
 contain placeholder facts such as `selection_pool`; a raw text search can
 mistake those examples for duplicate record obligations.
 
-## B2036: Comma-Formatted Unit Lists Mean Choice, Not Require-All
+## CASE-C: Comma-Formatted Unit Lists Mean Choice, Not Require-All
 
-When Scribe unit-list semantics matter, LLM-facing compiler projections must
+When Rules unit-list semantics matter, LLM-facing compiler projections must
 use explicit `and` or `or`. Do not use a comma as a neutral list separator for
 unit lists.
 
-B2036 exposed the failure mode. The source requirement was a mandatory listed
+CASE-C exposed the failure mode. The source requirement was a mandatory listed
 set:
 
 ```text
 You must complete the following four units (24 credit points):
 
-ACF1001 Accounting fundamentals
-ECF1100 Microeconomics
-ETF1100 Business statistics
-MGF1010 Introduction to management
+UNIT1001 Example subject one
+UNIT1002 Example subject two
+UNIT1003 Example subject three
+UNIT1004 Example subject four
 ```
 
-The generated Scribe used a comma `CourseList`:
+The generated Rules used a comma `CourseList`:
 
 ```text
-4 Classes in ACF 1001, ECF 1100, ETF 1100, MGF 1010
+4 Classes in UNIT 1001, UNIT 1002, UNIT 1003, UNIT 1004
   Label LABELTAG "Part A. Core studies"
 ```
 
-That is a choice/OR carrier in Scribe, not a require-all carrier. The LLM did
+That is a choice/OR carrier in Rules, not a require-all carrier. The LLM did
 not infer that a four-line mandatory source list meant all four units. It copied
 the comma surface form it received.
 
@@ -100,27 +102,27 @@ conclusion: multi-item comma lists were not recovered as AND. Two-code AND
 lists appeared only when the source itself carried explicit `and` or `both`
 wording.
 
-The B2036 request path had two OR-shaped inputs:
+The CASE-C request path had two OR-shaped inputs:
 
 1. The obligation ledger exposed only flat `source_unit` facts and no grouped
    `specified_units` / require-all authority.
 2. Distillation flattened the vertical unit list into comma text:
-   `ACF1001, ECF1100, ETF1100, MGF1010`.
+   `UNIT1001, UNIT1002, UNIT1003, UNIT1004`.
 
-The prompt correctly taught that comma lists have OR-style Scribe semantics.
+The prompt correctly taught that comma lists have OR-style Rules semantics.
 Given comma text and no typed all-of authority, the model generated
 `operator="comma"`.
 
 Rule:
 
 - Require-all unit lists must be projected as explicit `and` text, for example
-  `ACF1001 and ECF1100 and ETF1100 and MGF1010`.
+  `UNIT1001 and UNIT1002 and UNIT1003 and UNIT1004`.
 - Choice / one-of unit lists must be projected as explicit `or` text, for
-  example `ACF1001 or ECF1100 or ETF1100 or MGF1010`.
+  example `UNIT1001 or UNIT1002 or UNIT1003 or UNIT1004`.
 - Nested mixed lists must preserve grouping, for example
-  `(ACF1001 or ACW1001) and ECF1100`.
+  `(UNIT1001 or UNIT1005) and UNIT1002`.
 - Comma may still appear in quoted original source, JSON syntax, prose that is
-  not a semantic unit list, or explicit Scribe/BNF examples where comma is the
+  not a semantic unit list, or explicit Rules/BNF examples where comma is the
   intended OR/choice carrier.
 
 The fix is deterministic, not prompt-side guessing: facts emit typed grouped

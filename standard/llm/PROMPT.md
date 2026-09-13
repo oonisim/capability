@@ -1,5 +1,7 @@
 # LLM Prompt Contract Standard
 
+Project names, paths, and identifiers in the examples are anonymised.
+
 This standard defines what a production LLM prompt contract must do. A prompt is
 not a bag of hints. It is an interface contract between source evidence, the
 model, validators, and downstream code.
@@ -466,7 +468,7 @@ instead of acting.
 Dispatch rows should be mutually exclusive where possible. When overlap is
 unavoidable, priority order is part of the prompt contract. Put the most
 specific and safest row before broad fallback rows. For example, "generate from
-this CourseLoop JSON file" should outrank "read a workspace file", while "parse
+this RequirementsService JSON file" should outrank "read a workspace file", while "parse
 raw syntax" should not become "update a block" merely because a filename looks
 like a block ID.
 
@@ -578,8 +580,8 @@ Source obligation ledger is binding.
 
 Those instructions look safe, but together they can change the model's repair
 target.
-In the B6039 Scribe regression, this style of wording was added for an A2000
-layout-heading problem. It did not reliably fix A2000, and it shifted B6039
+In the CASE-B Rules regression, this style of wording was added for a CASE-D
+layout-heading problem. It did not reliably fix CASE-D, and it shifted CASE-B
 retry behavior: the model stopped reproducing the old `SubsetRule` under
 `GroupRule.items` failure, but began placing file-level `change_log` and
 `diagnostics` fields inside `block`. The prompt had moved the model from a
@@ -613,7 +615,7 @@ That broad rewrite mode is the problem. It gives the model permission to edit
 nearby or root-level review structures even when the validator asked for a
 local schema repair.
 
-In the B6039 case, the highest-risk phrases were:
+In the CASE-B case, the highest-risk phrases were:
 
 | Wording | Why it is dangerous |
 | --- | --- |
@@ -651,7 +653,7 @@ For obligation-ledger prompts:
   when supported child atoms may still be executable;
 - keep retry prompts focused on the actual validator error;
 - verify unrelated fields after a prompt change, especially root-vs-child
-  placement such as `ScribeFile.diagnostics` versus `Block`.
+  placement such as `RuleFile.diagnostics` versus `Block`.
 
 Prefer local retry wording:
 
@@ -659,7 +661,7 @@ Prefer local retry wording:
 For this validation error only, do not replace a
 GroupRule.items[].rule SubsetRule with a nested GroupRule unless that same
 node's source_evidence explicitly says all child rules are required.
-Otherwise place one UnsupportedScribeConstruct in ScribeFile.diagnostics.
+Otherwise place one UnsupportedRuleConstruct in RuleFile.diagnostics.
 Do not move change_log, diagnostics, metadata, or block root fields.
 ```
 

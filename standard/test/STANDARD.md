@@ -118,7 +118,7 @@ Rules:
 2. Tests must live under:
 
 ```
-smst-tool/tests/
+shared-tool/tests/
 ```
 
 3. The test should be placed in the **directory matching the module location**.
@@ -137,7 +137,7 @@ Example mapping:
 Example:
 
 ```
-mkdir -p smst-tool/tests/aws/authentication
+mkdir -p shared-tool/tests/aws/authentication
 ```
 
 5. Tests must verify both:
@@ -175,8 +175,8 @@ typos in comments, help text, and user‑facing messages.
 Scope:
 
 ```
-smst-tool/**/*.sh
-smst-tool/tests/**/*.bats
+shared-tool/**/*.sh
+shared-tool/tests/**/*.bats
 ```
 
 Rules:
@@ -197,7 +197,7 @@ aspell
 Example usage:
 
 ```
-codespell smst-tool
+codespell shared-tool
 ```
 
 Agents and contributors should run spell‑check when:
@@ -230,7 +230,7 @@ clear and readable.
 This convention applies to all directories under:
 
 ```
-smst-tool/tests/
+shared-tool/tests/
 ```
 
 and should be followed by both **developers and automated coding agents**.

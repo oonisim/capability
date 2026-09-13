@@ -91,13 +91,14 @@ doc/standards/system/ken_thompson.md
 doc/standards/code/python/STANDARD.md
 doc/standards/code/test/STANDARD.md
 
-For compiler only, verify compliance with
-data/degreeworks_scribe/landing/md/guide/ScribeLanguage_2025.md
-data/degreeworks_scribe/landing/bnf/ScribeLanguage_2025_slim.bnf
-src/app/scribe/agent/doc/DESIGN_COMPILER.md (if there is discrepancy, report and ask me)
+For compiler only, verify compliance with the project equivalents of these
+anonymised example paths:
+data/rules_service/landing/md/guide/RuleLanguage.md
+data/rules_service/landing/bnf/RuleLanguage_slim.bnf
+src/app/rules/agent/doc/DESIGN_COMPILER.md (if there is discrepancy, report and ask me)
 
 
 Do not just dump review request without factual basis by going through the data/log and prove the plan will work.
-data/course_loop/2026 for CourseLoop requirements.
-data/degreeworks/pprd/2026/block for Scribe.
-platform/observability/deployment/degreeworks_scribe/log/observe/2026AUG{14,15,16} for the execution logs especially AST and LLM logs.
+data/requirements_service/example for RequirementsService requirements.
+data/rules/example/block for Rules.
+platform/observability/deployment/rules_service/log/observe/example-run for the execution logs especially AST and LLM logs.

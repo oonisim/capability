@@ -160,7 +160,7 @@ right.
 ## Report Structure
 
 Defect reports follow the mandated JIRA section order in
-`doc/application/scribe/agent/issue`. All thirteen sections are required:
+`doc/application/rules/agent/issue`. All thirteen sections are required:
 
 ```text
 Jira Fields, Description, Environment, Impact, Steps To Reproduce,

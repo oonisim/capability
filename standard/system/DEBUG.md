@@ -1,5 +1,7 @@
 # Debugging Standard
 
+Project names, paths, and identifiers in the examples are anonymised.
+
 This document defines the required operational process for debugging production,
 integration, workflow, and regression failures. The goal is to move from symptom
 to proven cause to verified fix without speculative patching.
@@ -195,7 +197,7 @@ Conclusion: Async factory refactor no longer causes delayed sender failure
 - Why: Runner trusted sync type hints only.
 - How: Awaitable service results are rejected before JobOutSender construction.
 - When: Future async factory; current sync factory unaffected.
-- Where: src/app/scribe/agent/job.py:1157
+- Where: src/app/rules/agent/job.py:1157
 - Fix: Added awaitable guard before sender construction.
 - Verification: Focused job sender tests pass.
 - Regression guard: Test rejects awaitable messaging_factory result.
@@ -252,7 +254,7 @@ Verify if this will help accelerate issue understanding and resolution.
 
 ## Python concurrency hotspots
 
-in src/app/scribe/agent and src/app/scribe/frontend.
+in src/app/rules/agent and src/app/rules/frontend.
 
 ```text
 1. Conclusion: Terminal events can be lost before client delivery.
@@ -295,17 +297,17 @@ in src/app/scribe/agent and src/app/scribe/frontend.
 
 - Issue: to_thread cancellation does not stop work.
 - Why: wait_for cancels awaiter, not the underlying synchronous call.
-- How: Slow Lambda/CourseLoop calls continue in executor after timeout or frontend-dead cancellation.
+- How: Slow Lambda/RequirementsService calls continue in executor after timeout or frontend-dead cancellation.
 - When: Slow sync calls; not fast timeout-respecting clients.
-- Where: agent/tool/scribe.py, agent/tool/courseloop.py.
+- Where: agent/tool/rules.py, agent/tool/requirements_service.py.
 - Fix: Use async clients, hard request timeouts, and bounded semaphores.
 
 6. Conclusion: Future parallel jobs may contend on shared dependencies.
 
 - Issue: Pipeline dependencies are shared per process.
 - Why: Current director is sequential, but parallel execution would reuse providers concurrently.
-- How: Shared LLM, knowledge, Scribe, and pipeline deps would receive overlapping calls with mixed safety guarantees.
+- How: Shared LLM, knowledge, Rules, and pipeline deps would receive overlapping calls with mixed safety guarantees.
 - When: Future parallel jobs; not current sequential loop.
-- Where: agent/director.py, agent/scriber.py, agent/workflow/scribe_ast/nodes.py.
+- Where: agent/director.py, agent/generator.py, agent/workflow/rules_ast/nodes.py.
 - Fix: Preserve sequential invariant or create per-job dependency instances.
 ```
