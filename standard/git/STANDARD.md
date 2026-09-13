@@ -1,6 +1,6 @@
-# Bash Repository Hygiene
+# Git Repository Hygiene
 
-This file defines repository‑wide hygiene rules for Bash code and tests.
+This file defines git repository hygiene rules for Git commits and branches.
 
 ## Spellcheck
 
