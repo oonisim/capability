@@ -1,6 +1,6 @@
 # Standards
 
-Naming conventions and standards for AWS resources in smst-ai.
+Naming conventions and standards for AWS resources.
 
 ---
 
@@ -20,11 +20,11 @@ All path-based AWS resources use a consistent hierarchical convention.
 
 | Segment | Values | Example |
 |---------|--------|---------|
-| `organisation` | `esol` | Organisation that owns the resource |
-| `project` | `smst-ai` | Project name |
+| `organisation` | `example-org` | Organisation that owns the resource |
+| `project` | `example-project` | Project name |
 | `environment` | `dev`, `prd` | Deployment environment |
-| `system` | `courseloop`, `degreeworks` | Target system name |
-| `component` | `scribe`, `document` | Sub-component (optional, omit if none) |
+| `system` | `orders`, `billing` | Target system name |
+| `component` | `worker`, `api` | Sub-component (optional; omit if none) |
 | `version` | `v1`, `v2` | API version |
 | `type` | `key`, `config` | `key` for secrets, `config` for SSM parameters |
 
@@ -32,13 +32,13 @@ All path-based AWS resources use a consistent hierarchical convention.
 
 | Type | Path |
 |------|------|
-| Secret (key) | `esol/smst-ai/dev/courseloop/api/v1/key` |
-| Secret (key) | `esol/smst-ai/dev/degreeworks/scribe/api/v1/key` |
-| Secret (key) | `esol/smst-ai/dev/degreeworks/document/api/v1/key` |
-| SSM (config) | `/esol/smst-ai/dev/courseloop/api/v1/config` |
-| SSM (config) | `/esol/smst-ai/dev/degreeworks/scribe/api/v1/config` |
-| SSM (config) | `/esol/smst-ai/dev/degreeworks/document/api/v1/config` |
-| SSM (metadata) | `/esol/smst-ai/dev/dw-scribe/deploy-metadata` |
+| Secret (key) | `example-org/example-project/dev/orders/api/v1/key` |
+| Secret (key) | `example-org/example-project/dev/billing/worker/api/v1/key` |
+| Secret (key) | `example-org/example-project/dev/billing/api/api/v1/key` |
+| SSM (config) | `/example-org/example-project/dev/orders/api/v1/config` |
+| SSM (config) | `/example-org/example-project/dev/billing/worker/api/v1/config` |
+| SSM (config) | `/example-org/example-project/dev/billing/api/api/v1/config` |
+| SSM (metadata) | `/example-org/example-project/dev/application/deploy-metadata` |
 
 ### Rules
 
@@ -60,31 +60,31 @@ name prefix:
 {organisation}-{project}-{environment}
 ```
 
-Example: `esol-smst-ai-dev`
+Example: `example-org-example-project-dev`
 
 Each module appends a resource-specific suffix:
 
 | Resource | Pattern | Example |
 |----------|---------|---------|
-| IAM role | `{prefix}-{app}-ec2-role` | `esol-smst-ai-dev-dw-scribe-ec2-role` |
-| IAM policy | `{prefix}-{app}-{policy}` | `esol-smst-ai-dev-dw-scribe-bedrock` |
-| S3 bucket | `{prefix}-{app}-data-{suffix}` | `esol-smst-ai-dev-dw-scribe-data-f91c5b6c` |
-| Security group | `{prefix}-{app}-sg` | `esol-smst-ai-dev-dw-scribe-sg` |
-| ALB frontend SG | `{prefix}-{app}-sg-alb-frontend` | `esol-smst-ai-dev-dw-scribe-sg-alb-frontend` |
-| VPC endpoint | `{prefix}-common-vpce-{service}` | `esol-smst-ai-dev-common-vpce-ssm` |
-| Organisation SG | `{prefix}-common-org` | `esol-smst-ai-dev-common-org` |
-| Prefix list | `{prefix}-common-org-cidrs` | `esol-smst-ai-dev-common-org-cidrs` |
-| Lambda function | `{prefix}-{app}-scribe-endpoint` | `esol-smst-ai-dev-dw-scribe-scribe-endpoint` |
-| DynamoDB table | `{prefix}-{app}-scribe-job` | `esol-smst-ai-dev-dw-scribe-scribe-job` |
-| ALB | `{prefix}-scribe` | `esol-smst-ai-dev-scribe` (32-char limit, penultimate segment stripped) |
-| R53 hosted zone | `{project}-{env}.{parent}` | `smst-ai-dev.aws.monash.edu` |
+| IAM role | `{prefix}-{application}-ec2-role` | `example-org-example-project-dev-api-ec2-role` |
+| IAM policy | `{prefix}-{application}-{policy}` | `example-org-example-project-dev-api-runtime-access` |
+| S3 bucket | `{prefix}-{application}-data-{suffix}` | `example-org-example-project-dev-api-data-a1b2c3d4` |
+| Security group | `{prefix}-{application}-sg` | `example-org-example-project-dev-api-sg` |
+| ALB frontend SG | `{prefix}-{application}-sg-alb-frontend` | `example-org-example-project-dev-api-sg-alb-frontend` |
+| VPC endpoint | `{prefix}-common-vpce-{service}` | `example-org-example-project-dev-common-vpce-ssm` |
+| Organisation security group | `{prefix}-common-org` | `example-org-example-project-dev-common-org` |
+| Prefix list | `{prefix}-common-org-cidrs` | `example-org-example-project-dev-common-org-cidrs` |
+| Lambda function | `{prefix}-{application}-{function}` | `example-org-example-project-dev-api-handler` |
+| DynamoDB table | `{prefix}-{application}-{table}` | `example-org-example-project-dev-api-jobs` |
+| ALB | `{prefix}-{application}` | `example-org-example-project-dev-api` (32-character limit may require shortening) |
+| Route 53 hosted zone | `{project}-{environment}.{parent-domain}` | `example-project-dev.example.com` |
 
 ### IAM SID Rules
 
 All IAM policy SIDs must match `[0-9A-Za-z]*` only — no hyphens,
 underscores, or special characters. Use CamelCase of the name prefix.
 
-Example: `esol-smst-ai-dev` → SID prefix `EsolSmstAiDev`
+Example: `example-org-example-project-dev` → SID prefix `ExampleOrgExampleProjectDev`
 
 ---
 
@@ -117,12 +117,12 @@ are ambiguous across services — they cannot be categorised automatically.
 | S3 | `s3_` | `s3_data_bucket_name`, `s3_artifacts_bucket_name` |
 | Security Group | `sg_` | `sg_alb_frontend_id`, `sg_vpc_endpoint_id` |
 | ALB | `alb_` | `alb_frontend_arn`, `alb_frontend_dns_name` |
-| Lambda | `lambda_` | `lambda_function_arn`, `lambda_scribe_endpoint_alias_arn` |
+| Lambda | `lambda_` | `lambda_function_arn`, `lambda_api_alias_arn` |
 | ECR | `ecr_` | `ecr_repository_urls`, `ecr_repository_arns` |
 | Route 53 | `r53_` | `r53_public_zone_id`, `r53_name_servers` |
 | VPC | `vpc_` | `vpc_id`, `vpc_cidr_block` |
 | SSM Parameter Store | `ssm_` | `ssm_deploy_metadata_name` |
-| Secrets Manager | `sm_` | `sm_scribe_api_key_arn` |
+| Secrets Manager | `sm_` | `sm_api_key_arn` |
 | KMS | `kms_` | `kms_customer_key_arn` |
 | ACM | `acm_` | `acm_certificate_arn` |
 
@@ -155,7 +155,7 @@ Scripts under `utility/` use a verb prefix that describes the script's intent:
 | Prefix | Intent | Example |
 |---|---|---|
 | `monitor_` | Health check — read-only probe of a live resource | `monitor_alb.sh` |
-| `invoke_` | Trigger or call a remote resource (Lambda, API) | `invoke_scribe_endpoint.sh` |
+| `invoke_` | Trigger or call a remote resource (Lambda, API) | `invoke_api_endpoint.sh` |
 | `run_` | Execute a pipeline or multi-step operation | `run_pipeline_destroy_dev.sh` |
 | `release_` | Promote code through environments | `release_feature.sh` |
 | `generate_` | Produce a report, artefact, or derived output | `generate_cost_report.sh` |
