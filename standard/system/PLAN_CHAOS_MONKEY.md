@@ -224,39 +224,39 @@ fails), the workflow aborts and sends `JOB_ABORTED`.
 
 ---
 
-### 4. Requirements Service Down
+### 4. Reference Data Service Down
 
-**What is it:** The service that resolves course requirements by `course_sys_id`.
-Called from `collect_input` node via `_fetch_requirements_service(...)`.
+**What is it:** The service that resolves reference data by `record_id`.
+Called from `collect_input` node via `_fetch_reference_data(...)`.
 
 **What happens:**
 
-`_fetch_requirements_service(...)` does not catch exceptions. If the RequirementsService client
+`_fetch_reference_data(...)` does not catch exceptions. If the ReferenceDataService client
 raises, the exception propagates out of `collect_input`. The workflow aborts at
 the first node.
 
 **Partial failure (service responds with error field):**
 
-If RequirementsService returns a response with `raw_course["error"]` set, the call
+If ReferenceDataService returns a response with `raw_record["error"]` set, the call
 succeeds at the HTTP level. The audit event records `degraded: true` and the
-`error` string. The workflow continues with whatever requirements RequirementsService
-returned.
+`error` string. The workflow continues with whatever reference data the
+ReferenceDataService returned.
 
 **Audit events written:**
 
-`REQUIREMENTS_SERVICE_CALL` with `degraded: true` and `error: str(...)` for partial
+`REFERENCE_DATA_SERVICE_CALL` with `degraded: true` and `error: str(...)` for partial
 failures. Nothing written if the exception is raised before the call returns.
 
 **Log messages:**
 
 | Source | Level | Message / action key |
 |---|---|---|
-| `job.py` | ERROR | `job setup or pipeline raised unhandled exception` / `pipeline_error` (if RequirementsService raises) |
+| `job.py` | ERROR | `job setup or pipeline raised unhandled exception` / `pipeline_error` (if ReferenceDataService raises) |
 
 **User-facing SSE event:**
 
-- If RequirementsService raises: `JOB_ABORTED` with `status: "ABORTED"`.
-- If RequirementsService returns partial data: job continues normally; `JOB_COMPLETED`
+- If ReferenceDataService raises: `JOB_ABORTED` with `status: "ABORTED"`.
+- If ReferenceDataService returns partial data: job continues normally; `JOB_COMPLETED`
   is the likely outcome unless downstream failures occur.
 
 **Job final state in DDB:** `ABORTED` (unavailable) or `PROCESSED` (partial data)
@@ -641,7 +641,7 @@ The second worker deletes the message and moves on. No duplicate execution.
 | Parse returns ok=false, repairs exhausted | PROCESSED | JOB_COMPLETED (human review) | `PARSE_CALL` + `requires_human_review` |
 | LLM provider unreachable | ABORTED | JOB_ABORTED | `pipeline_error` |
 | Knowledge service down | PROCESSED (degraded) | JOB_COMPLETED (human review) or JOB_ABORTED | `knowledge_search_failed` + `KNOWLEDGE_DEGRADED` |
-| RequirementsService unreachable | ABORTED | JOB_ABORTED | `pipeline_error` |
+| ReferenceDataService unreachable | ABORTED | JOB_ABORTED | `pipeline_error` |
 | DDB down at submission | Not created | HTTP 503 | none (propagated) |
 | DDB down mid-execution (audit writes) | PROCESSING (incomplete audit) | none immediately | `log_step_failed` |
 | DDB down mid-execution (liveness) | ABORTED (eventual) | JOB_ABORTED (synthesized) | `liveness_poll_failed` then `frontend_dead` |

@@ -297,9 +297,9 @@ in src/app/rules/agent and src/app/rules/frontend.
 
 - Issue: to_thread cancellation does not stop work.
 - Why: wait_for cancels awaiter, not the underlying synchronous call.
-- How: Slow Lambda/RequirementsService calls continue in executor after timeout or frontend-dead cancellation.
+- How: Slow Lambda/ReferenceDataService calls continue in executor after timeout or frontend-dead cancellation.
 - When: Slow sync calls; not fast timeout-respecting clients.
-- Where: agent/tool/rules.py, agent/tool/requirements_service.py.
+- Where: agent/tool/rules.py, agent/tool/reference_data_service.py.
 - Fix: Use async clients, hard request timeouts, and bounded semaphores.
 
 6. Conclusion: Future parallel jobs may contend on shared dependencies.

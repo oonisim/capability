@@ -34,7 +34,7 @@ candidate names, lookup status, and short reasons.
 ## CASE-B: Treat LLM Input Shape as Behaviour
 
 An LLM request schema is part of runtime behaviour, even when a changed field
-adds no academic meaning. CASE-B exposed this boundary: adding `pool_id` to pool
+adds no domain meaning. CASE-B exposed this boundary: adding `pool_id` to pool
 objects repeated identity already carried elsewhere and changed the request
 shape. In a bounded rebuilt sample, the field-absent shape produced valid
 initial AST JSON in three runs; the field-present shape produced malformed JSON
@@ -58,75 +58,75 @@ When inspecting a request, parse its real payload boundary. Prompt examples can
 contain placeholder facts such as `selection_pool`; a raw text search can
 mistake those examples for duplicate record obligations.
 
-## CASE-C: Comma-Formatted Unit Lists Mean Choice, Not Require-All
+## CASE-C: Comma-Formatted Item Lists Mean Choice, Not Require-All
 
-When Rules unit-list semantics matter, LLM-facing compiler projections must
+When target rule-language list semantics matter, LLM-facing compiler projections must
 use explicit `and` or `or`. Do not use a comma as a neutral list separator for
-unit lists.
+item lists.
 
 CASE-C exposed the failure mode. The source requirement was a mandatory listed
 set:
 
 ```text
-You must complete the following four units (24 credit points):
+The record requires the following four items (24 credits):
 
-UNIT1001 Example subject one
-UNIT1002 Example subject two
-UNIT1003 Example subject three
-UNIT1004 Example subject four
+ITEM1001 Example item one
+ITEM1002 Example item two
+ITEM1003 Example item three
+ITEM1004 Example item four
 ```
 
-The generated Rules used a comma `CourseList`:
+The generated target representation used a comma `ItemList`:
 
 ```text
-4 Classes in UNIT 1001, UNIT 1002, UNIT 1003, UNIT 1004
-  Label LABELTAG "Part A. Core studies"
+4 Items in ITEM 1001, ITEM 1002, ITEM 1003, ITEM 1004
+  Label LABELTAG "Part A. Core requirements"
 ```
 
-That is a choice/OR carrier in Rules, not a require-all carrier. The LLM did
-not infer that a four-line mandatory source list meant all four units. It copied
+That is a choice/OR carrier in target rule language, not a require-all carrier. The LLM did
+not infer that a four-line mandatory source list meant all four items. It copied
 the comma surface form it received.
 
 Local log review confirmed the behavior:
 
 - 853 local `*_AST_EXTRACTED.log` files were scanned.
 - 808 contained parseable AST/IR payloads.
-- CourseList operators found locally: `single=6666`, `comma=1230`, `or=191`,
+- ItemList operators found locally: `single=6666`, `comma=1230`, `or=191`,
   `and=58`.
-- Every `operator="and"` CourseList had exactly two items.
-- `operator="and"` CourseLists with three or more items: `0`.
-- `operator="comma"` CourseLists with three or more items: `917`.
+- Every `operator="and"` ItemList had exactly two items.
+- `operator="and"` ItemLists with three or more items: `0`.
+- `operator="comma"` ItemLists with three or more items: `917`.
 
 The broader investigation over 851 AST_EXTRACTED logs reached the same
-conclusion: multi-item comma lists were not recovered as AND. Two-code AND
+conclusion: multi-item comma lists were not recovered as AND. Two-item AND
 lists appeared only when the source itself carried explicit `and` or `both`
 wording.
 
 The CASE-C request path had two OR-shaped inputs:
 
-1. The obligation ledger exposed only flat `source_unit` facts and no grouped
-   `specified_units` / require-all authority.
-2. Distillation flattened the vertical unit list into comma text:
-   `UNIT1001, UNIT1002, UNIT1003, UNIT1004`.
+1. The obligation ledger exposed only flat `source_item` facts and no grouped
+   `specified_items` / require-all authority.
+2. Distillation flattened the vertical item list into comma text:
+   `ITEM1001, ITEM1002, ITEM1003, ITEM1004`.
 
-The prompt correctly taught that comma lists have OR-style Rules semantics.
+The prompt correctly taught that comma lists have OR-style target rule-language semantics.
 Given comma text and no typed all-of authority, the model generated
 `operator="comma"`.
 
 Rule:
 
-- Require-all unit lists must be projected as explicit `and` text, for example
-  `UNIT1001 and UNIT1002 and UNIT1003 and UNIT1004`.
-- Choice / one-of unit lists must be projected as explicit `or` text, for
-  example `UNIT1001 or UNIT1002 or UNIT1003 or UNIT1004`.
+- Require-all item lists must be projected as explicit `and` text, for example
+  `ITEM1001 and ITEM1002 and ITEM1003 and ITEM1004`.
+- Choice / one-of item lists must be projected as explicit `or` text, for
+  example `ITEM1001 or ITEM1002 or ITEM1003 or ITEM1004`.
 - Nested mixed lists must preserve grouping, for example
-  `(UNIT1001 or UNIT1005) and UNIT1002`.
+  `(ITEM1001 or ITEM1005) and ITEM1002`.
 - Comma may still appear in quoted original source, JSON syntax, prose that is
-  not a semantic unit list, or explicit Rules/BNF examples where comma is the
+  not a semantic item list, or explicit target-language/BNF examples where comma is the
   intended OR/choice carrier.
 
 The fix is deterministic, not prompt-side guessing: facts emit typed grouped
-`specified_units` source authority, distillation exposes
-`source_semantics=require_all`, `course_list_operator=AND`, and
-`required_units_text` joined with `and`, and downstream reconciliation/codegen
+`specified_items` source authority, distillation exposes
+`source_semantics=require_all`, `item_list_operator=AND`, and
+`required_items_text` joined with `and`, and downstream reconciliation/codegen
 must reject comma/OR carriers for source-proven require-all lists.

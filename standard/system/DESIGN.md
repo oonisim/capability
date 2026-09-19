@@ -519,7 +519,7 @@ Allowed:
 ```text
 --env dev
 --workflow health-check
---data course.json
+--data input.json
 ```
 
 Not allowed in user-facing workflows:
@@ -611,17 +611,17 @@ or service locator.
 Good design makes dependencies visible in the structure of the code:
 
 ```python
-class CourseProcessor:
-    def __init__(self, repository: CourseRepository) -> None:
+class RecordProcessor:
+    def __init__(self, repository: RecordRepository) -> None:
         self._repository = repository
 ```
 
 Poor design hides dependencies inside the implementation:
 
 ```python
-class CourseProcessor:
+class RecordProcessor:
     def process(self) -> None:
-        repository = lookup("course-repository")
+        repository = lookup("record-repository")
 ```
 
 The first shape tells reviewers, tests, static analysis, and callers what the

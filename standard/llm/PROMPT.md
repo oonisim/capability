@@ -468,7 +468,7 @@ instead of acting.
 Dispatch rows should be mutually exclusive where possible. When overlap is
 unavoidable, priority order is part of the prompt contract. Put the most
 specific and safest row before broad fallback rows. For example, "generate from
-this RequirementsService JSON file" should outrank "read a workspace file", while "parse
+this ReferenceDataService JSON file" should outrank "read a workspace file", while "parse
 raw syntax" should not become "update a block" merely because a filename looks
 like a block ID.
 
