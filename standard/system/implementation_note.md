@@ -1,5 +1,6 @@
 implementation slice by slice within the review workflow.
 
+# Right Problem
 Always ask. Is it the Right Problem Framing?
 Tackling a wrong problem will result in wasted effort and time.
 It is better to ask and clarify than to assume and conclude from memory.
@@ -17,7 +18,23 @@ It enforces clear isolation of responsibility and makes it easier to test and ma
 
 Keep Simple. No over-engineering. complexity is evil.
 
-## Correct Authority
+# Right Responsibility
+
+The right problem must be handled by the right owner. Act only within your
+responsibility boundary. Source problems belong to the source owner. when you
+are not the source owner, it is not the right problem for you.
+
+For instance, AI tries to solve the fidelity or insufficiency problems.
+
+- **Semantic infidelity:** the source does not faithfully or unambiguously express
+  the intended requirement. AI must not choose an interpretation or guess intent.
+- **Data insufficiency:** information needed to apply the requirement is missing,
+  implicit or lacks authority. AI must not invent it or combine separate records
+  to fill the gap.
+
+It is the owner of the source data or requirements who must solve the problems.
+
+# Correct Authority
 
 Identify the source of truth, decision authorities. Do not follow non-authoritative.
 
@@ -71,34 +88,5 @@ Do not touch other code just to make the parser work. Use adapter.py if need adj
 ---
 
 # Prevent False Validation
-make sure not to cause false validation that is damaging (cause unnecessary AST LLM retry that can further damage correct AST nodes or false error nodes).
-  Unnecessary strict validation had cause it and had serious impacts.
-  It is better to avoid false validation. We an catch error in the later verification by comparing the source data and take better fix action.
-  False validation wil
-
 
 ---
-
-# Review
-
-
-ask for review at each slice.
-
-Follow
-
-doc/standards/system/DESIGN.md
-doc/standards/system/ken_thompson.md
-doc/standards/code/python/STANDARD.md
-doc/standards/code/test/STANDARD.md
-
-For compiler only, verify compliance with the project equivalents of these
-anonymised example paths:
-data/rules_service/landing/md/guide/RuleLanguage.md
-data/rules_service/landing/bnf/RuleLanguage_slim.bnf
-src/app/rules/agent/doc/DESIGN_COMPILER.md (if there is discrepancy, report and ask me)
-
-
-Do not just dump review request without factual basis by going through the data/log and prove the plan will work.
-data/reference_data_service/example for ReferenceDataService requirements.
-data/rules/example/block for Rules.
-platform/observability/deployment/rules_service/log/observe/example-run for the execution logs especially AST and LLM logs.
