@@ -1,3 +1,4 @@
+# Small Step at a Time
 implementation slice by slice within the review workflow.
 
 # Right Problem
@@ -24,13 +25,12 @@ The right problem must be handled by the right owner. Act only within your
 responsibility boundary. Source problems belong to the source owner. when you
 are not the source owner, it is not the right problem for you.
 
-For instance, AI tries to solve the fidelity or insufficiency problems.
+For instance, AI tries to solve the fidelity or sufficiency problems.
 
 - **Semantic infidelity:** the source does not faithfully or unambiguously express
-  the intended requirement. AI must not choose an interpretation or guess intent.
+  the intended requirement.
 - **Data insufficiency:** information needed to apply the requirement is missing,
-  implicit or lacks authority. AI must not invent it or combine separate records
-  to fill the gap.
+  implicit or lacks authority.
 
 It is the owner of the source data or requirements who must solve the problems.
 
