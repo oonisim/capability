@@ -31,35 +31,14 @@ Excellent Writing is Engineering of the Reader's Thought Process.
       <td>テーマ（何を言いたい・伝えたい）</td>
       <td>
         <p>
-          Reader must be able to recognize the Intention of the author
-          that drives the objective, conclusion, structure, navigation,
-          and style.
+          Reader must be able to recognize the Intention of the author; 
+          the understanding the author intends to establish.
+          That intention drives the conclusion, structure, navigation, and style.
         </p>
         <p>
-        The **actionable** conclusion must come first. Then the root cause, 
-        cause/effect mechanism, and evidences that supports the logic. 
-        Writing that lets the reader ask 'so what?' has no value.
-        </p>
-        <ul>
-          <li>
-            Symbol (言葉、記号、図) とその位置は、その言葉、その位置、
-            その繋がりでなければならない意図が設計・実装・検証されている。
-          </li>
-          <li>
-            Central concept first; introduce other concepts only to
-            explain or substantiate it.
-          </li>
-          <li>
-            Diagram であれば上下左右の方向性に明確な意図が
-            設計・実装・検証されている。
-          </li>
-          <li>
-            Style: 質問なのか、意見表明なのか、説明なのか。
-          </li>
-        </ul>
-        <p>
-          Stephen Hawking の「A Brief History of Time」は
-          「宇宙のその始まりとこれからを解説」。
+          The <strong>actionable</strong> conclusion must come first. 
+          Then the cause/effect mechanism and evidences that supports the logic.
+          Otherwise, violates Focus, Economy, and Coherence all together.
         </p>
       </td>
     </tr>
@@ -74,45 +53,10 @@ Excellent Writing is Engineering of the Reader's Thought Process.
       </td>
     </tr>
     <tr>
-      <td>Integrity</td>
-      <td>
-        記号、言葉、概念が正確かつ厳密に定義されているか。
-        Conceptual integrity — 概念の一貫性
-      </td>
-      <td>
-        <p>
-          思考・概念は言葉によって導かれる。
-          そのためには記号/用語の一貫した論理と考慮の深さに基づいて
-          正しく定義されていること。
-        </p>
-        <p>
-          定義されていないものは使わない
-          （当たり前だがそうでない文書があまりに多い）。
-        </p>
-        <p>
-          同じものなら同じシンボルを使う。異なるなら異なるものを使う。
-          そして「同じであるべき」・「異なるべき」岩盤の根拠があること。
-        </p>
-        <p>
-          同じ概念を異なる記号で表さない。
-          例えば Syntax/BNF の文書で T、id、lexeme、non-terminal を
-          使うことは不要な翻訳思考コストを強いるだけ。
-        </p>
-        <p>
-          異なる記号を導入するなら、「異なっていなければならない」
-          MUST な根拠があり、その違いに明確な意味がなければならない。
-        </p>
-        <p>
-          これは単なる表記の好みではなく、読者が概念を正しく理解するための
-          設計原則。
-        </p>
-      </td>
-    </tr>
-    <tr>
       <td>Intuition</td>
       <td>
-        まず概念、アイデアを直感的に理解可能な形で示しているか。
-        Intuition before formalism — 形式より先に直感
+        まず概念、アイデアを直感的に理解可能な形で示しているか。<br>
+        Intuition before formalism — 形式より先に直感。
       </td>
       <td>
         <p>
@@ -144,9 +88,35 @@ Excellent Writing is Engineering of the Reader's Thought Process.
       </td>
     </tr>
     <tr>
+      <td>Integrity</td>
+      <td>
+        Conceptual integrity is about Representation consistency invariant.<br>
+        記号、言葉、概念が正確かつ厳密に定義されているか。
+      </td>
+      <td>
+        <p>
+          Unnecessary symbolic variation imposes cognitive translation costs.
+        </p>
+        <p>
+          思考・概念は言葉によって導かれる。
+          記号/用語は一貫した論理で正しく定義されていること。定義されていないものは使わない。
+        　でなければ不要な翻訳思考コストを強いる。
+        </p>
+        <p>
+          同じ概念を異なる記号で表さない。同じ概念は同じ表記を用い、異なるなら異なる表記を使う。
+        </p>
+        <p>
+          異なる記号を導入するなら、「異なっていなければならない」MUST な根拠がある。
+        </p>
+        <p>
+          これは単なる表記の好みではなく、読者が概念を正しく理解するための設計原則。
+        </p>
+      </td>
+    </tr>
+    <tr>
       <td>Compression</td>
       <td>
-        伝えるべきアイデアが凝縮されているか。
+        伝えるべきアイデアが凝縮されているか。<br>
         Compression without information loss — 本質を失わない圧縮
       </td>
       <td>
@@ -171,7 +141,7 @@ Excellent Writing is Engineering of the Reader's Thought Process.
     <tr>
       <td>Coherence</td>
       <td>
-        論理が途切れずにつながっているか。
+        論理が途切れずにつながっているか。<br>
         Cognitive Continuity — 思考の連続性
       </td>
       <td>
@@ -179,12 +149,25 @@ Excellent Writing is Engineering of the Reader's Thought Process.
           Navigation＝自然に追跡できる順序構造 (logical order) が
           設計実装されている。
         </p>
+        <ul>
+          <li>
+            Central concept first; introduce other concepts only to
+            explain or substantiate it.
+          </li>
+          <li>
+            Symbol (言葉、記号、図) とその位置は、その言葉、その位置、
+            その繋がりでなければならない意図が設計・実装・検証されている。
+          </li>
+          <li>
+            Diagram であれば上下左右の方向性に明確な意図が
+            設計・実装・検証されている。
+          </li>
+          <li>
+            Style: 質問なのか、意見表明なのか、説明なのか。
+          </li>
+        </ul>
         <p>
           読者に説明されていない論理的な橋を架けさせない。
-        </p>
-        <p>
-          Diagram であれば上下左右の方向性に明確な意図が
-          設計実装されている。
         </p>
         <p>
           「文章のベクトル軌跡」
@@ -192,10 +175,8 @@ Excellent Writing is Engineering of the Reader's Thought Process.
           Chunk を切り出せるか考えていた時のもの）。
         </p>
         <p>
-          1月3日の議論では、文章を単なる文の集合ではなく、
-          読者の思考を意味空間の中で移動させるものとして捉えていました。
+          文章は読者の思考を意味空間の中で移動させるもの。
         </p>
-        <p>そこでは次の概念を検討しています。</p>
         <ul>
           <li>
             <strong>Semantic Vector Trajectory:</strong>
