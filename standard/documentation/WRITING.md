@@ -56,7 +56,9 @@ Excellent Writing is Engineering of the Reader's Thought Process.
       <td>Intuition</td>
       <td>
         まず概念、アイデアを直感的に理解可能な形で示しているか。<br>
-        Intuition before formalism — 形式より先に直感。
+        Intuition before formalism — 形式より先に直感。<br>
+        It is a mandatory design principle to form the intuition first.
+        Because Intuition engineers the understanding of formalism.
       </td>
       <td>
         <p>
@@ -256,3 +258,17 @@ Excellent Writing is Engineering of the Reader's Thought Process.
   </tbody>
 </table>
 
+
+# Checklist
+
+| Criterion    | WHAT must be guaranteed                                                                      |
+|:-------------|:---------------------------------------------------------------------------------------------|
+| Intention    | Conclude what to understand right at the start.                                              |
+| Focus        | Remain engineered toward the understanding.                                                  |
+| Intuition    | Essential conceptual model before formal representation.                                     |
+| Integrity    | Concepts with consistent meanings and representations throughout the document.               |
+| Coherence    | Engineered progression of thought without unexplained conceptual or logical discontinuities. |
+| Compression  | Minimum representation with complete information.                                            |
+| Economy      | Minimum cognitive effort required.                                                           |
+| Technique    | Optimal Representation to engineer the understanding.                                        |
+| Insight      | Reader emerges with the understanding reconstructed.                                         |
