@@ -163,8 +163,8 @@ Excellent Writing is Engineering of the Reader's Thought Process.
     <tr>
       <td>Coherence</td>
       <td>
-        論理が途切れずにつながっているか。<br>
-        Cognitive Continuity — 思考の連続性
+        Cognitive Continuity — 思考の連続性<br>
+        論理が途切れずにつながり。その境界が Transition Connective で明示されている。
       </td>
       <td>
         <p>
@@ -193,8 +193,7 @@ Excellent Writing is Engineering of the Reader's Thought Process.
         </p>
         <p>
           「文章のベクトル軌跡」
-          （Chunking のアルゴリズムでどうやったら意味のまとまりとしての
-          Chunk を切り出せるか考えていた時のもの）。
+          （Chunking のアルゴリズムであれば、意味のまとまりとしての Chunk の境界を切出せる）。
         </p>
         <p>
           文章は読者の思考を意味空間の中で移動させるもの。
