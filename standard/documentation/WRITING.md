@@ -116,6 +116,26 @@ Excellent Writing is Engineering of the Reader's Thought Process.
       </td>
     </tr>
     <tr>
+      <td>Orthogonality</td>
+      <td>Are conceptually independent aspects kept distinct?</td>
+      <td>
+        <p>
+          <strong>Conceptually orthogonal</strong> means independent at the level of ideas:
+          two concepts describe separate aspects of something, so changing one aspect
+          does not inherently require changing the other.
+        </p>
+        <p>
+          For example, a drawing's colour and shape can vary independently.
+          A rule requiring all circles to be red connects them within a particular system;
+          the concepts themselves do not require that connection.
+        </p>
+        <p>
+          Keep conceptually orthogonal concepts distinct in explanations.
+          If the system being described connects them, explain that connection explicitly.
+        </p>
+      </td>
+    </tr>
+    <tr>
       <td>Compression</td>
       <td>
         伝えるべきアイデアが凝縮されているか。<br>
@@ -199,7 +219,7 @@ Excellent Writing is Engineering of the Reader's Thought Process.
         </ul>
         <p>
           重要なのは、話題が変わること自体が悪いのではなく、
-          読者がその移動の理由を追跡できるかという点でした。
+          読者がその移動の理由を追跡できること。
         </p>
         <p>
           今回の Pearl の説明は、まさにその例です。
@@ -210,6 +230,27 @@ Excellent Writing is Engineering of the Reader's Thought Process.
           数学的には正しくても、読者の頭の中では、
           A と B の関係について理解を組み直す必要が生じます。
           これは文章の semantic transition の設計問題として分析できます。
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td>Economy</td>
+      <td>不必要な認知負荷を排除しているか。</td>
+      <td>
+        <p>
+          <strong>Conceptual economy</strong> means using only the concepts and explanations
+          necessary for the reader to understand correctly or act correctly.
+          Avoid unnecessary new concepts, distinctions, and repetition.
+        </p>
+        <p>
+          Do not explain what the reader already knows unless that explanation is necessary
+          for correct understanding or execution. Reuse established definitions; restate
+          them when needed to resolve ambiguity or prevent an error.
+        </p>
+        <p>
+          優れた文章は読者に不要な推論を強いないが、
+          読者自身が行うべき本質的な推論や再構築の過程は
+          奪うわけではない。
         </p>
       </td>
     </tr>
@@ -235,17 +276,6 @@ Excellent Writing is Engineering of the Reader's Thought Process.
       </td>
     </tr>
     <tr>
-      <td>Economy</td>
-      <td>不必要な認知負荷を排除しているか。</td>
-      <td>
-        <p>
-          優れた文章は読者に不要な推論を強いないが、
-          読者自身が行うべき本質的な推論や再構築の過程は
-          奪うわけではない。
-        </p>
-      </td>
-    </tr>
-    <tr>
       <td>Insight</td>
       <td>読後に本質的な理解が残るか。</td>
       <td>
@@ -267,8 +297,9 @@ Excellent Writing is Engineering of the Reader's Thought Process.
 | Focus        | Remain engineered toward the understanding.                                                  |
 | Intuition    | Essential conceptual model before formal representation.                                     |
 | Integrity    | Concepts with consistent meanings and representations throughout the document.               |
+| Orthogonality | Keep independent concepts distinct; explain connections imposed by the system described.    |
 | Coherence    | Engineered progression of thought without unexplained conceptual or logical discontinuities. |
 | Compression  | Minimum representation with complete information.                                            |
-| Economy      | Minimum cognitive effort required.                                                           |
+| Economy      | Use only needed concepts and explanations, accounting for the reader's existing knowledge.   |
 | Technique    | Optimal Representation to engineer the understanding.                                        |
 | Insight      | Reader emerges with the understanding reconstructed.                                         |
